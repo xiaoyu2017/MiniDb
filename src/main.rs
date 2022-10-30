@@ -1,55 +1,37 @@
 use std::collections::HashMap;
 use std::io;
 
+use crate::pojo::stringdata::StringData;
+// 引入属性
+use crate::tool::command::MiniDb;
+
+// 需要加载的代码
+pub mod tool;
+pub mod pojo;
+
 fn main() {
-    let mut map: HashMap<&str, &str> = HashMap::new();
+    let mut string_data = StringData::new();
+    'input: loop {
+        let mut command = String::new();
 
-    let mut command = String::new();
-
-    // 循环获得用户输入
-    loop {
-        // 用户输入的整行信息
         io::stdin().read_line(&mut command).expect("读取命令失败！");
-
         // 获取命令信息
         let option: Option<String> = match command.trim().parse() {
             Ok(i) => Option::Some(i),
             Err(i) => continue
         };
 
-        let mut info: Vec<String> = Vec::new();
-
-        match option {
-            Some(x) => {
-                for item in x.split_whitespace() {
-                    info.push(item.to_string());
-                }
+        if let Some(i) = option {
+            let vec = MiniDb::command_to_vec(&i);
+            if vec[0] == "set" {
+                &mut string_data.set(vec[1].to_string(), vec[2].to_string());
+                println!("success");
+            } else if vec[0] == "get" {
+                println!("{}", &mut string_data.get(vec[1].to_string()));
+            } else {
+                println!("End of the program！");
+                break 'input;
             }
-            _ => ()
-        }
-        let x1 = info[0];
-
-        match info[0] {
-            "set".to_string() => {
-                let x = &info[1];
-                map.insert(&info[1], &info[2]);
-            }
-            _ => ()
-        }
-
-        println!("end map:{:?}", map);
+        };
     }
 }
-//
-// fn command_info(str: Option<String>) -> Vec<String> {
-//     match str {
-//         Some(x) => {
-//             let mut vec: Vec<String> = Vec::new();
-//             for item in x.split_whitespace() {
-//                 vec.push(item.to_string());
-//             }
-//             vec
-//         }
-//         _ => vec![]
-//     }
-// }
